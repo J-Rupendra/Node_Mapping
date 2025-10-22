@@ -1,15 +1,16 @@
 import { API_ENDPOINT } from "./constants.js";
 import { convertRawDataToRelational, createNodeElement, fetchData } from "./utilities.js";
 
-// stored the references to avoid retriving multiple times
-const treeContainer = document.getElementById('tree-container');
-const popupContainer = document.getElementById('popup-container');
-const closeButton = document.getElementById('close-btn');
+ 
+// Used as functions to dynamically import which is used for writing test cases
+const treeContainer = () => document.getElementById('tree-container');
+const popupContainer = () => document.getElementById('popup-container');
+const closeButton = () => document.getElementById('close-btn');
 
 let selectedNode = null;
 
 // Used to create node block and children subtree
-const createSubTree = (nodeChildren)=>{
+export const createSubTree = (nodeChildren)=>{
     const childContainer = document.createElement('ul');
     for(const node of nodeChildren){
         const element = document.createElement('li');
@@ -37,38 +38,40 @@ fetchData(API_ENDPOINT).then(data=>{
 
     rootElement.appendChild(rootChild);
 
-    treeContainer.appendChild(rootElement);
+    treeContainer()?.appendChild(rootElement);
     
 
 }).catch(err=>{
     openPopup({name:"Error", description: "Something went wrong!, Check if server is running or reload this page"}, true)
 })
 
-function openPopup({name="",description=""}, isError=false){
-    popupContainer.classList.add('show');
-    closeButton.classList.remove('hide')
+export function openPopup({name="",description=""}, isError=false){
+    popupContainer()?.classList.add('show');
+    closeButton()?.classList.remove('hide')
 
     if(isError){
-        popupContainer.classList.add('error');
-        closeButton.classList.add('hide')
+        popupContainer()?.classList.add('error');
+        closeButton()?.classList.add('hide')
     }
 
     const titleElement = document.getElementById('popup-title');
-    titleElement.textContent = name;
     const descriptionElement = document.getElementById('popup-description');
-    descriptionElement.textContent = description;
+    if(titleElement && descriptionElement){
+        titleElement.textContent = name;
+        descriptionElement.textContent = description;
+    }
 
 }
 
-function closePopup(){
-    popupContainer?.classList.remove('show');
+export function closePopup(){
+    popupContainer()?.classList.remove('show');
     if (selectedNode) {
         selectedNode.classList.remove('active')
     }
 }
 
 // event delegation to capture the node block click
-treeContainer.addEventListener('click',(event)=>{
+treeContainer()?.addEventListener('click',(event)=>{
     const currentSelection = event.target;
     if(!currentSelection.classList.contains('node-content')){
         closePopup();
@@ -83,7 +86,7 @@ treeContainer.addEventListener('click',(event)=>{
     openPopup(currentSelection?.dataset)
 })
 
-closeButton.addEventListener('click', () => {
+closeButton()?.addEventListener('click', () => {
     closePopup()
 })
 
